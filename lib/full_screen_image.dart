@@ -2,38 +2,75 @@ library full_screen_image_null_safe;
 
 import 'package:flutter/material.dart';
 
+/// Gesture callback names of hero image .
+enum GestureName {
+  onTap,
+  onDoubleTap,
+  onLongPress,
+  onScaleStart,
+  onScaleEnd,
+}
+
 class FullScreenWidget extends StatelessWidget {
   FullScreenWidget(
       {required this.child,
       this.backgroundColor = Colors.black,
       this.backgroundIsTransparent = true,
-      this.disposeLevel});
+      this.disposeLevel,
+      this.gestureNames = const [GestureName.onTap]});
 
   final Widget child;
   final Color backgroundColor;
   final bool backgroundIsTransparent;
   final DisposeLevel? disposeLevel;
+  final List<GestureName> gestureNames;
+
+  forwardFullScreen(BuildContext context) {
+    Navigator.push(
+        context,
+        PageRouteBuilder(
+            opaque: false,
+            barrierColor: backgroundIsTransparent
+                ? Colors.white.withOpacity(0)
+                : backgroundColor,
+            pageBuilder: (BuildContext context, _, __) {
+              return FullScreenPage(
+                child: child,
+                backgroundColor: backgroundColor,
+                backgroundIsTransparent: backgroundIsTransparent,
+                disposeLevel: disposeLevel,
+              );
+            }));
+  }
 
   @override
-  Widget build(BuildContext context) { 
+  Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-            context,
-            PageRouteBuilder(
-                opaque: false,
-                barrierColor: backgroundIsTransparent
-                    ? Colors.white.withOpacity(0)
-                    : backgroundColor,
-                pageBuilder: (BuildContext context, _, __) {
-                  return FullScreenPage(
-                    child: child,
-                    backgroundColor: backgroundColor,
-                    backgroundIsTransparent: backgroundIsTransparent,
-                    disposeLevel: disposeLevel,
-                  );
-                }));
-      },
+      onTap: (gestureNames.isEmpty || gestureNames.contains(GestureName.onTap))
+          ? () {
+              forwardFullScreen(context);
+            }
+          : null,
+      onDoubleTap: (gestureNames.contains(GestureName.onDoubleTap))
+          ? () {
+              forwardFullScreen(context);
+            }
+          : null,
+      onLongPress: (gestureNames.contains(GestureName.onLongPress))
+          ? () {
+              forwardFullScreen(context);
+            }
+          : null,
+      onScaleStart: (gestureNames.contains(GestureName.onScaleStart))
+          ? (ScaleStartDetails _) {
+              forwardFullScreen(context);
+            }
+          : null,
+      onScaleEnd: (gestureNames.contains(GestureName.onScaleEnd))
+          ? (ScaleEndDetails _) {
+              forwardFullScreen(context);
+            }
+          : null,
       child: child,
     );
   }
@@ -130,13 +167,12 @@ class _FullScreenPageState extends State<FullScreenPage> {
         positionYDelta = 0;
       });
 
-      Future.delayed(animationDuration).then((_){
+      Future.delayed(animationDuration).then((_) {
         setState(() {
           animationDuration = Duration.zero;
         });
       });
     }
-
   }
 
   @override
