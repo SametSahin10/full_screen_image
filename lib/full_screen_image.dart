@@ -15,7 +15,7 @@ class FullScreenWidget extends StatelessWidget {
   final DisposeLevel? disposeLevel;
 
   @override
-  Widget build(BuildContext context) { 
+  Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -106,7 +106,7 @@ class _FullScreenPageState extends State<FullScreenPage> {
     double tmp = positionYDelta < 0
         ? 1 - ((positionYDelta / 1000) * -1)
         : 1 - (positionYDelta / 1000);
-    print(tmp);
+    // print(tmp);
 
     if (tmp > 1)
       opacity = 1;
@@ -130,13 +130,12 @@ class _FullScreenPageState extends State<FullScreenPage> {
         positionYDelta = 0;
       });
 
-      Future.delayed(animationDuration).then((_){
+      Future.delayed(animationDuration).then((_) {
         setState(() {
           animationDuration = Duration.zero;
         });
       });
     }
-
   }
 
   @override
